@@ -4,6 +4,8 @@ import datetime
 import threading
 import time
 import eventlet
+from pgnotify import await_pg_notifications
+import pgpubsub
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
@@ -32,11 +34,18 @@ def test_disconnect():
     print('Client disconnected')
 
 def loop_report_time():
+    print('started thread')
+    pubsub = pgpubsub.connect(user='oleg', database='oleg')
+    pubsub.listen('channel1')
     while True:
-        print('emit')
-        socketio.emit('my response', {'data': str(datetime.datetime.now() )},
-                broadcast=True, namespace='/test')
-        eventlet.sleep(10)
+        event = pubsub.get_event()
+        while event:
+            print(event.payload)
+            socketio.emit('my response',
+                    { 'data': "{}: {}".format(datetime.datetime.now(), event.payload) },
+                    broadcast=True, namespace='/test')
+            event = pubsub.get_event()
+        eventlet.sleep(0.1)
 
 eventlet.spawn(loop_report_time)
 

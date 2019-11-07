@@ -2,4 +2,4 @@ eventlet
 Flask
 flask-socketio
 gevent-websocket
-pgnotify
+pgpubsub
