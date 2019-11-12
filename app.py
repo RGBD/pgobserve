@@ -1,15 +1,19 @@
+print('start')
 from flask import Flask, escape, request, redirect, url_for
 from flask_socketio import SocketIO, emit
 import datetime
 import threading
 import time
 import eventlet
-from pgnotify import await_pg_notifications
 import pgpubsub
+import os
+import sys
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
+print('m0')
 socketio = SocketIO(app, logger=True, engineio_logger=True)
+print('m1')
 
 @app.route('/')
 def index():
@@ -35,7 +39,12 @@ def test_disconnect():
 
 def loop_report_time():
     print('started thread')
-    pubsub = pgpubsub.connect(user='oleg', database='oleg')
+    pubsub = pgpubsub.connect(
+            host=os.getenv('DATABASE_HOST'), 
+            database=os.getenv('DATABASE_NAME'),
+            user=os.getenv('DATABASE_USER'),
+            password=os.getenv('DATABASE_PASSWORD'),
+            )
     pubsub.listen('channel1')
     while True:
         event = pubsub.get_event()
@@ -50,4 +59,5 @@ def loop_report_time():
 eventlet.spawn(loop_report_time)
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0')
+    print('mark2')

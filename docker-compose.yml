@@ -1,0 +1,18 @@
+db:
+  image: "postgres:11.5"
+  environment:
+    - POSTGRES_USER=pgobserve
+    - POSTGRES_PASSWORD=pgobserve
+  ports:
+    - "5432:5432"
+api:
+  build: .
+  ports:
+    - "5000:5000"
+  links:
+    - "db"
+  environment:
+    - DATABASE_HOST=db
+    - DATABASE_NAME=pgobserve
+    - DATABASE_USER=pgobserve
+    - DATABASE_PASSWORD=pgobserve
