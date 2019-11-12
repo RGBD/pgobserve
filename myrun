@@ -1,8 +1,0 @@
-#!/bin/bash
-
-DATABASE_HOST=localhost
-DATABASE_NAME=oleg
-DATABASE_USER=oleg
-DATABASE_PASSWORD=bugmenot
-
-python ./app.py
