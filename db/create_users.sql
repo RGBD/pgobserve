@@ -2,24 +2,23 @@ drop table if exists users;
 create table users(id serial primary key, name varchar);
 
 drop function if exists notify_users_insert();
-
 CREATE FUNCTION notify_users_change() RETURNS TRIGGER AS $BODY$
 BEGIN
   IF (TG_OP = 'DELETE') THEN
     perform PG_NOTIFY(
-      'channel1',
-      'delete from users: ' || OLD.id
+      'users_change',
+      'DELETE|{ id: "' || OLD.id || '" }'
     );
     RETURN OLD;
   ELSIF (TG_OP = 'UPDATE') THEN
     perform PG_NOTIFY(
-      'channel1',
-      'update users: ' || NEW.id || ', ' || NEW.name
+      'users_change',
+      'UPDATE|{ id: "' || NEW.id || '", name: "' || NEW.name || '" }'
     );
   ELSIF (TG_OP = 'INSERT') THEN
     perform PG_NOTIFY(
-      'channel1',
-      'insert into users: ' || NEW.id || ', ' || NEW.name
+      'users_change',
+      'INSERT|{ id: "' || NEW.id || '", name: "' || NEW.name || '" }'
     );
     RETURN NEW;
   END IF;

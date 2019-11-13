@@ -2,7 +2,6 @@ db:
   image: "postgres:11.5"
   volumes: 
     - ./db/create_users.sql:/docker-entrypoint-initdb.d/10-init.sql
-    - ./db/data:/var/lib/postgresql/data:z
   environment:
     - POSTGRES_USER=pgobserve
     - POSTGRES_PASSWORD=pgobserve
